@@ -1,5 +1,5 @@
 -- HIENVIP BASIC LOADER - KHÔNG LỖI, KHÔNG MÃ HÓA, CHẠY NGAY
-local url = "https://raw.githubusercontent.com/hieu59323-cmd/hienking/main/HIENVIPOPL.lua"
+local url = "https://raw.githubusercontent.com/hieu59323-cmd/hienking/refs/heads/main/HIENVIPOPL.lua"
 
 local function safe(url)
     local ok, res = pcall(function()
