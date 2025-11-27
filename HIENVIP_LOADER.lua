@@ -1,7 +1,7 @@
 -- HIENVIP FINAL LOADER
 
 local HttpService = game:GetService("HttpService")
-local ENCRYPTED_URL = "https://raw.githubusercontent.com/hieu59323-cmd/hienking/refs/heads/main/HIENVIPOPL.lua"
+local ENCRYPTED_URL = "https://raw.githubusercontent.com/hieu59323-cmd/hienking/refs/heads/main/HIENVIP_LOADER.lua"
 local XOR_KEY = 73
 
 local function safeGet(url)
