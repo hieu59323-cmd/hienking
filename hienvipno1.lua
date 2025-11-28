@@ -1,3 +1,217 @@
+-- FIXED15 FIRE/H I E N toggle
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+
+-- create toggle button
+local gui = Instance.new("ScreenGui")
+gui.Name = "HIENVIP_TOGGLE"
+gui.IgnoreGuiInset = true
+gui.ResetOnSpawn = false
+gui.Parent = CoreGui
+
+local btn = Instance.new("TextButton")
+btn.Name = "FireToggle"
+btn.Size = UDim2.new(0,60,0,60)
+btn.Position = UDim2.new(0,20,0,100)
+btn.Text = "🔥"
+btn.TextScaled = true
+btn.BackgroundColor3 = Color3.fromRGB(30,30,30)
+btn.TextColor3 = Color3.fromRGB(255,70,70)
+btn.Parent = gui
+
+local menuVisible = true
+
+local function setVisible(state)
+    for _,g in ipairs(CoreGui:GetChildren()) do
+        if g ~= gui and g:IsA("ScreenGui") then
+            g.Enabled = state
+        end
+    end
+end
+
+btn.MouseButton1Click:Connect(function()
+    menuVisible = not menuVisible
+    setVisible(menuVisible)
+end)
+
+
+
+-- =========================================
+-- HIENVIP FIXED14 — FIRE TOGGLE (Style B)
+-- Inserts a premium FIRE + HIEN toggle, optimized for mobile FPS.
+-- Place this at the top of your script file (already prepended).
+-- Behavior:
+--  - Tap FIRE/HIEN: toggles the full menu (show/hide)
+--  - Removes "Open Menu (Fast)" UI occurrences (keeps FastMode)
+--  - Optimized: minimal loops, cached menu lookup, high DisplayOrder
+-- =========================================
+
+task.spawn(function()
+    repeat task.wait() until game:IsLoaded()
+    local CoreGui = game:GetService("CoreGui")
+    local RunService = game:GetService("RunService")
+
+    -- remove any existing helper UI
+    pcall(function()
+        local old = CoreGui:FindFirstChild("HIENVIP_FIRE_TOGGLE_V14")
+        if old then old:Destroy() end
+    end)
+
+    -- create lightweight ScreenGui
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "HIENVIP_FIRE_TOGGLE_V14"
+    gui.ResetOnSpawn = false
+    gui.IgnoreGuiInset = true
+    pcall(function() gui.DisplayOrder = 99999 end)
+    gui.Parent = CoreGui
+
+    -- container frame (transparent)
+    local cont = Instance.new("Frame")
+    cont.Name = "HIENVIP_TOGGLE_CONTAINER"
+    cont.Size = UDim2.new(0, 140, 0, 48)
+    cont.Position = UDim2.new(0, 16, 0, 68) -- default; try to reposition under HIEN label
+    cont.BackgroundTransparency = 1
+    cont.BorderSizePixel = 0
+    cont.ZIndex = 99999
+    cont.Parent = gui
+
+    -- premium fire icon (left)
+    local iconBtn = Instance.new("TextButton")
+    iconBtn.Name = "HIENVIP_FIRE_BTN_V14"
+    iconBtn.Parent = cont
+    iconBtn.Size = UDim2.new(0, 48, 0, 48)
+    iconBtn.Position = UDim2.new(0, 0, 0, 0)
+    iconBtn.BackgroundColor3 = Color3.fromRGB(18,18,18)
+    iconBtn.BorderSizePixel = 0
+    iconBtn.AutoButtonColor = true
+    iconBtn.Text = "🔥"
+    iconBtn.Font = Enum.Font.GothamBlack
+    iconBtn.TextScaled = true
+    iconBtn.TextColor3 = Color3.fromRGB(255,140,30)
+    iconBtn.ZIndex = 99999
+
+    -- HIEN label (red)
+    local lbl = Instance.new("TextButton")
+    lbl.Name = "HIENVIP_FIRE_LABEL_V14"
+    lbl.Parent = cont
+    lbl.AnchorPoint = Vector2.new(0,0)
+    lbl.Position = UDim2.new(0, 56, 0, 10)
+    lbl.Size = UDim2.new(0, 72, 0, 28)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = "HIEN"
+    lbl.Font = Enum.Font.GothamBold
+    lbl.TextSize = 18
+    lbl.TextColor3 = Color3.fromRGB(255,60,60) -- red color
+    lbl.TextScaled = false
+    lbl.AutoButtonColor = false
+    lbl.ZIndex = 99999
+
+    -- cheap menu cache and find function (tries many fallbacks)
+    local cachedMenu = nil
+    local function FindMenu()
+        if cachedMenu and cachedMenu.Parent then return cachedMenu end
+        local cg = CoreGui
+        local names = {"HIENVIP_UI","HIENVIP_MAIN","HIEN_UI","HIENVIP","HIEN VIP","HIENVIP_WINDOW"}
+        for _,n in ipairs(names) do
+            local f = cg:FindFirstChild(n)
+            if f then cachedMenu = f; return f end
+        end
+        -- fallback: look for descendant with 'HIEN' in name or a TextLabel with 'HIEN' text
+        for _,v in ipairs(cg:GetDescendants()) do
+            if v:IsA("ScreenGui") or v:IsA("Frame") or v:IsA("ImageLabel") then
+                local name = tostring(v.Name):upper()
+                if name:find("HIEN") or name:find("HIENVIP") then cachedMenu = v; return v end
+            end
+            if (v:IsA("TextLabel") or v:IsA("TextButton")) and v.Text and #v.Text>0 then
+                local t = tostring(v.Text):upper()
+                if t:find("HIEN") or t:find("HIENVIP") then
+                    -- attempt to get parent ScreenGui/Frame
+                    local par = v
+                    for i=1,6 do
+                        par = par.Parent
+                        if not par then break end
+                        if par:IsA("ScreenGui") or par:IsA("Frame") then cachedMenu = par; return par end
+                    end
+                end
+            end
+        end
+        return nil
+    end
+
+    -- reposition container under any 'HIEN' label found
+    local function TryPositionUnderHIEN()
+        for _,v in ipairs(CoreGui:GetDescendants()) do
+            if (v:IsA("TextLabel") or v:IsA("TextButton")) and v.Text and #v.Text>0 then
+                local txt = tostring(v.Text):upper()
+                if txt:find("HIEN") then
+                    local ok1, ax = pcall(function() return v.AbsolutePosition end)
+                    local ok2, asz = pcall(function() return v.AbsoluteSize end)
+                    if ok1 and ok2 and ax and asz then
+                        local newX = math.max(6, math.floor(ax.X))
+                        local newY = math.max(6, math.floor(ax.Y) - cont.AbsoluteSize.Y - 8)
+                        cont.Position = UDim2.new(0, newX, 0, newY)
+                        return true
+                    end
+                end
+            end
+        end
+        return false
+    end
+
+    -- attempt once to reposition (after render step to allow absolute sizes)
+    RunService.RenderStepped:Wait()
+    pcall(TryPositionUnderHIEN)
+
+    -- toggle state and function
+    local visible = false
+    local function ToggleFullMenu()
+        local menu = FindMenu()
+        if not menu then
+            -- try bridge fallbacks
+            if _G and _G.HIENVIP_BRIDGE then
+                pcall(function()
+                    if _G.HIENVIP_BRIDGE.SetVisible then visible = not visible; _G.HIENVIP_BRIDGE.SetVisible(visible); return end
+                    if _G.HIENVIP_BRIDGE.Window then menu = _G.HIENVIP_BRIDGE.Window end
+                end)
+            end
+            if not menu then return end
+        end
+
+        visible = not visible
+        pcall(function() if menu.Enabled ~= nil then menu.Enabled = visible end end)
+        pcall(function() if menu.Visible ~= nil then menu.Visible = visible end end)
+        pcall(function() if menu.Frame and menu.Frame.Visible ~= nil then menu.Frame.Visible = visible end end)
+        pcall(function() if menu._Main and menu._Main.Visible ~= nil then menu._Main.Visible = visible end end)
+    end
+
+    -- remove any "Open Menu (Fast)" UI pieces if present (best-effort)
+    pcall(function()
+        for _,v in ipairs(CoreGui:GetDescendants()) do
+            if (v:IsA("TextButton") or v:IsA("TextLabel")) and v.Text and type(v.Text)=="string" then
+                local t = v.Text:lower()
+                if t:find("open menu fast") or t:find("openmenufast") then
+                    v.Text = "" 
+                    v.Visible = false
+                end
+            end
+        end
+    end)
+
+    -- connect interactions (icon and label both toggle)
+    iconBtn.MouseButton1Click:Connect(ToggleFullMenu)
+    lbl.MouseButton1Click:Connect(ToggleFullMenu)
+
+    -- keep gui parented (cheap check)
+    RunService.Heartbeat:Connect(function()
+        if gui.Parent ~= CoreGui then gui.Parent = CoreGui end
+    end)
+
+end)
+-- end FIXED14 module
+
+
+-- ===== ORIGINAL SCRIPT STARTS HERE =====
+
 
 --========================================================--
 -- 🚀 HIENVIP ULTRA FAST INSTANT UI (0.05s Load)
@@ -8778,7 +8992,6 @@ pcall(function()
     openBtn.Name = "HIENVIP_Lite_OpenFull"
     openBtn.Size = UDim2.new(0, 120, 0, 28)
     openBtn.Position = UDim2.new(0, 64, 0, 44)
-    openBtn.Text = "Open Menu (Fast)"
     openBtn.AutoButtonColor = true
 
     local fastBtn = Instance.new("TextButton", mainFrame)
