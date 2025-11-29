@@ -1,3 +1,90 @@
+-- ============================================
+-- HIENVIP FIXED16 – ULTIMATE GUI OPTIMIZED
+-- (Chỉ thêm UI, không đụng code gốc của bạn)
+-- ============================================
+
+task.spawn(function()
+    repeat task.wait() until game:IsLoaded()
+
+    local CoreGui = game:GetService("CoreGui")
+    local RunService = game:GetService("RunService")
+
+    -- Xóa UI cũ nếu tồn tại
+    local old = CoreGui:FindFirstChild("HIENVIP_TOGGLE_UI")
+    if old then old:Destroy() end
+
+    local ui = Instance.new("ScreenGui")
+    ui.Name = "HIENVIP_TOGGLE_UI"
+    ui.ResetOnSpawn = false
+    ui.IgnoreGuiInset = true
+    ui.Parent = CoreGui
+
+    -- NÚT HIEN VIP (màu đỏ)
+    local hienBtn = Instance.new("TextButton")
+    hienBtn.Parent = ui
+    hienBtn.Size = UDim2.new(0, 110, 0, 36)
+    hienBtn.Position = UDim2.new(0, 10, 0, 10)
+    hienBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    hienBtn.TextColor3 = Color3.fromRGB(255, 40, 40)  -- MÀU ĐỎ
+    hienBtn.Font = Enum.Font.GothamBold
+    hienBtn.TextScaled = true
+    hienBtn.BorderSizePixel = 0
+    hienBtn.Text = "HIEN VIP"
+
+    -- ICON FIRE (ON/OFF MENU)
+    local fireBtn = Instance.new("TextButton")
+    fireBtn.Parent = ui
+    fireBtn.Size = UDim2.new(0, 50, 0, 36)
+    fireBtn.Position = UDim2.new(0, 125, 0, 10)
+    fireBtn.BackgroundTransparency = 1
+    fireBtn.Font = Enum.Font.GothamBold
+    fireBtn.TextScaled = true
+    fireBtn.TextColor3 = Color3.fromRGB(255, 80, 40)
+    fireBtn.Text = "🔥"   -- ICON FIRE
+
+    -- Cache menu để tăng FPS
+    local menu = nil
+    local function GetMenu()
+        if menu and menu.Parent then return menu end
+
+        menu =
+            CoreGui:FindFirstChild("HIENVIP_UI")
+            or CoreGui:FindFirstChild("HIENVIP_MAIN")
+            or CoreGui:FindFirstChild("HIEN_UI")
+            or CoreGui:FindFirstChild("HIENVIP")
+            or nil
+
+        return menu
+    end
+
+    -- ===== HIEN VIP = BẬT MENU =====
+    hienBtn.MouseButton1Click:Connect(function()
+        local m = GetMenu()
+        if not m then return end
+
+        m.Enabled = true     -- Chỉ bật menu
+    end)
+
+    -- ===== FIRE = ON/OFF MENU =====
+    local isOn = true
+    fireBtn.MouseButton1Click:Connect(function()
+        isOn = not isOn
+        fireBtn.Text = isOn and "🔥" or "❌"
+
+        local m = GetMenu()
+        if m then
+            m.Enabled = isOn
+        end
+    end)
+
+    -- GUI luôn cố định trong CoreGui
+    RunService.Heartbeat:Connect(function()
+        if ui.Parent ~= CoreGui then
+            ui.Parent = CoreGui
+        end
+    end)
+end)
+
 -- FIXED15 FIRE/H I E N toggle
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
