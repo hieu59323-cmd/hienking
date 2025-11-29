@@ -62,7 +62,7 @@ task.spawn(function()
         local m = GetMenu()
         if not m then return end
 
-        m.Enabled = true     -- Chỉ bật menu
+        m.Enabled = false     -- Chỉ bật menu
     end)
 
     -- ===== FIRE = ON/OFF MENU =====
